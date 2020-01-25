@@ -1,0 +1,2 @@
+export FLASK_APP=flask-annons
+export FLASK_ENV=development
