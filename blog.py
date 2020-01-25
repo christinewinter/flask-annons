@@ -17,15 +17,15 @@ def index():
     """Show all the posts, most recent first."""
     db = get_db()
     posts = db.execute(
-        "SELECT id, title, body, created, author_id"
+        "SELECT id, title, body, created, email"
         " FROM post"
         " ORDER BY created DESC"
     ).fetchall()
     return render_template("blog/index.html", posts=posts)
 
 
-def get_post(id, check_author=True):
-    """Get a post and its author by id.
+def get_post(id):
+    """Get a post by id.
 
     :param id: id of post to get
     :return: the post with author information
@@ -34,7 +34,7 @@ def get_post(id, check_author=True):
     post = (
         get_db()
         .execute(
-            "SELECT id, title, body, created, author_id"
+            "SELECT id, title, body, created, email"
             " FROM post"
             " WHERE id = ?",
             (id,),
@@ -54,7 +54,7 @@ def create():
     if request.method == "POST":
         title = request.form["title"]
         body = request.form["body"]
-        author_id = request.form["author_id"]
+        email = request.form["email"]
         error = None
 
         if not title:
@@ -65,8 +65,8 @@ def create():
         else:
             db = get_db()
             db.execute(
-                "INSERT INTO post (title, body, author_id) VALUES (?, ?, ?)",
-                (title, body, 1),
+                "INSERT INTO post (title, body, email) VALUES (?, ?, ?)",
+                (title, body, email),
             )
             db.commit()
             return redirect(url_for("blog.index"))
@@ -76,7 +76,7 @@ def create():
 
 @bp.route("/<int:id>/update", methods=("GET", "POST"))
 def update(id):
-    """Update a post if the current user is the author."""
+    """Update a post."""
     post = get_post(id)
 
     if request.method == "POST":
@@ -103,9 +103,6 @@ def update(id):
 @bp.route("/<int:id>/delete", methods=("POST",))
 def delete(id):
     """Delete a post.
-
-    Ensures that the post exists and that the logged in user is the
-    author of the post.
     """
     get_post(id)
     db = get_db()

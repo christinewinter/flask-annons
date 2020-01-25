@@ -8,8 +8,8 @@
   <form method="post">
     <label for="title">Title</label>
     <input name="title" id="title" value="{{ request.form['title'] }}" required>
-	<label for="author_id">author_id</label>
-    <input name="author_id" id="author_id" value="{{ request.form['author_id'] }}" required>
+	<label for="email">e-mail</label>
+    <input name="email" id="email" value="{{ request.form['email'] }}" required>
 
     <label for="body">Body</label>
     <textarea name="body" id="body">{{ request.form['body'] }}</textarea>
