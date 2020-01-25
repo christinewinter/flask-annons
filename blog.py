@@ -17,7 +17,7 @@ def index():
     """Show all the posts, most recent first."""
     db = get_db()
     posts = db.execute(
-        "SELECT id, title, body, created, email"
+        "SELECT id, title, body, created, email, price"
         " FROM post"
         " ORDER BY created DESC"
     ).fetchall()
@@ -34,7 +34,7 @@ def get_post(id):
     post = (
         get_db()
         .execute(
-            "SELECT id, title, body, created, email"
+            "SELECT id, title, body, created, email, price"
             " FROM post"
             " WHERE id = ?",
             (id,),
@@ -55,6 +55,7 @@ def create():
         title = request.form["title"]
         body = request.form["body"]
         email = request.form["email"]
+        price = request.form["price"]
         error = None
 
         if not title:
@@ -65,8 +66,8 @@ def create():
         else:
             db = get_db()
             db.execute(
-                "INSERT INTO post (title, body, email) VALUES (?, ?, ?)",
-                (title, body, email),
+                "INSERT INTO post (title, body, email, price) VALUES (?, ?, ?, ?)",
+                (title, body, email, price),
             )
             db.commit()
             return redirect(url_for("blog.index"))
@@ -82,6 +83,7 @@ def update(id):
     if request.method == "POST":
         title = request.form["title"]
         body = request.form["body"]
+        price = request.form["price"]
         error = None
 
         if not title:
@@ -92,7 +94,8 @@ def update(id):
         else:
             db = get_db()
             db.execute(
-                "UPDATE post SET title = ?, body = ? WHERE id = ?", (title, body, id)
+                "UPDATE post SET title = ?, body = ?, email = ?, price = ? WHERE id = ?", 
+                (title, body, email, price, id)
             )
             db.commit()
             return redirect(url_for("blog.index"))
