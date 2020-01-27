@@ -82,12 +82,12 @@ def create():
             flash(error)
         else:
             db = get_db()
-            if not price:
+            if price is None:
                 db.execute(
                     "INSERT INTO post (title, body, email) VALUES (?, ?, ?)",
                     (title, body, email),
                 )
-            elif price is None:
+            else:
                             db.execute(
                     "INSERT INTO post (title, body, email, price) VALUES (?, ?, ?, ?)",
                     (title, body, email, price),
