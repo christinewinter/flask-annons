@@ -24,11 +24,22 @@ def index():
     return render_template("blog/index.html", posts=posts)
 
 
+@bp.route("/sort_by_price")
+def sort_by_price():
+    db = get_db()
+    posts = db.execute(
+        "SELECT id, title, body, created, email, price"
+        " FROM post"
+        " ORDER BY price DESC"
+    ).fetchall()
+    return render_template("blog/sort_by_price.html", posts=posts)
+
+
 def get_post(id):
     """Get a post by id.
 
     :param id: id of post to get
-    :return: the post with author information
+    :return: the post with information
     :raise 404: if a post with the given id doesn't exist
     """
     post = (
@@ -61,14 +72,26 @@ def create():
         if not title:
             error = "Title is required."
 
+        if not body:
+            error = "Description is required."
+
+        if not email or "@" not in email:
+            error = "Valid email is required."
+
         if error is not None:
             flash(error)
         else:
             db = get_db()
-            db.execute(
-                "INSERT INTO post (title, body, email, price) VALUES (?, ?, ?, ?)",
-                (title, body, email, price),
-            )
+            if not price:
+                db.execute(
+                    "INSERT INTO post (title, body, email) VALUES (?, ?, ?)",
+                    (title, body, email),
+                )
+            elif price is None:
+                            db.execute(
+                    "INSERT INTO post (title, body, email, price) VALUES (?, ?, ?, ?)",
+                    (title, body, email, price),
+                )
             db.commit()
             return redirect(url_for("blog.index"))
 
@@ -83,6 +106,7 @@ def update(id):
     if request.method == "POST":
         title = request.form["title"]
         body = request.form["body"]
+        email = request.form["email"]
         price = request.form["price"]
         error = None
 
